@@ -573,11 +573,7 @@ footer {
 <!-- ══ HERO ══ -->
 <div class="scroll-section" id="hero-scroll">
   <div class="sticky-stage" id="hero-stage">
-    <img class="frame-img" id="hero-frame"
-         src="Futuristic_tower_with_gardens_202607101549_frames/frame_001.jpg"
-         alt="Meridian Tower Exterior"
-         data-frame="1"
-         onerror="this.style.display='none'">
+    <canvas class="frame-img" id="hero-frame" aria-label="Meridian Tower Exterior"></canvas>
     <div class="hero-overlay"></div>
     <div class="hero-content" id="hero-content">
       <div class="hero-eyebrow" id="h-eye">Architectural Living</div>
@@ -695,11 +691,7 @@ footer {
 <!-- ══ CINEMATIC WALKTHROUGH ══ -->
 <div class="scroll-section" id="tour-scroll">
   <div class="sticky-stage" id="tour-stage">
-    <img class="frame-img" id="tour-frame"
-         src="Penthouse_interior_walkthrough_n__202607101550_frames/frame_001.jpg"
-         alt="Penthouse Interior Walkthrough"
-         data-frame="1"
-         onerror="this.style.display='none'">
+    <canvas class="frame-img" id="tour-frame" aria-label="Penthouse Interior Walkthrough"></canvas>
     <div class="tour-overlay"></div>
     <div class="tour-content">
       <div class="tour-left">
@@ -975,25 +967,41 @@ footer {
 const TOWER = 'Futuristic_tower_with_gardens_202607101549_frames/';
 const INT   = 'Penthouse_interior_walkthrough_n__202607101550_frames/';
 const TOTAL = 240;
+const SRC_W = 1280, SRC_H = 720;
 
 function pad(n) { return String(n).padStart(3, '0'); }
 
 // ── LOADER ────────────────────────────────────────────────────────
 const loader = document.getElementById('loader');
 const loaderFill = document.getElementById('loader-fill');
-let loadProgress = 0;
+let loadedCount = 0;
+const TOTAL_TO_LOAD = TOTAL * 2;
 
-function updateLoader(val) {
-  loadProgress = Math.min(100, loadProgress + val);
-  loaderFill.style.width = loadProgress + '%';
-  if (loadProgress >= 100) {
-    setTimeout(() => {
-      loader.classList.add('hidden');
-      initAnimations();
-    }, 400);
-  }
+function bumpLoader() {
+  loadedCount++;
+  loaderFill.style.width = (loadedCount / TOTAL_TO_LOAD * 100) + '%';
 }
-updateLoader(50); // Instantly jump to 50% since we don't need to preload frames anymore
+
+// Preload every frame in a sequence up front and decode it off the
+// main thread, so scrubbing during scroll never waits on the network.
+function preloadSequence(dir) {
+  const frames = new Array(TOTAL);
+  return Promise.all(
+    Array.from({ length: TOTAL }, (_, i) => new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        if (window.createImageBitmap) {
+          createImageBitmap(img).then(bmp => { frames[i] = bmp; bumpLoader(); resolve(); })
+            .catch(() => { frames[i] = img; bumpLoader(); resolve(); });
+        } else {
+          frames[i] = img; bumpLoader(); resolve();
+        }
+      };
+      img.onerror = () => { frames[i] = null; bumpLoader(); resolve(); };
+      img.src = `${dir}frame_${pad(i + 1)}.jpg`;
+    }))
+  ).then(() => frames);
+}
 
 // ── CURSOR ────────────────────────────────────────────────────────
 const cur  = document.getElementById('cur');
@@ -1023,55 +1031,91 @@ document.querySelectorAll('a, button, .p-card, input, select, textarea, .testi-d
   });
 });
 
-// ── FRAME SCRUBBER ────────────────────────────────────────────────
-function scrub(scrollEl, imgEl, dir) {
-  const rect    = scrollEl.getBoundingClientRect();
-  const travel  = scrollEl.offsetHeight - window.innerHeight;
-  if (travel <= 0) return 0;
+// ── FRAME SCRUBBER (canvas, pre-decoded frames, rAF-driven) ────────
+function makeStage(canvasEl) {
+  const ctx = canvasEl.getContext('2d');
+  let cw = 0, ch = 0, dpr = 1;
 
-  const progress = Math.max(0, Math.min(1, -rect.top / travel));
-  const idx      = Math.min(TOTAL, Math.max(1, Math.round(progress * (TOTAL - 1)) + 1));
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cw = canvasEl.clientWidth; ch = canvasEl.clientHeight;
+    canvasEl.width = cw * dpr; canvasEl.height = ch * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingQuality = 'high';
+  }
+  window.addEventListener('resize', resize);
+  resize();
 
-  if (parseInt(imgEl.dataset.frame, 10) !== idx) {
-    if (imgEl.style.display === 'none') return progress;
-    imgEl.src = `${dir}frame_${pad(idx)}.jpg`;
-    imgEl.dataset.frame = idx;
+  function coverRect() {
+    const scale = Math.max(cw / SRC_W, ch / SRC_H);
+    const w = SRC_W * scale, h = SRC_H * scale;
+    return { x: (cw - w) / 2, y: (ch - h) / 2, w, h };
+  }
 
-    for (let i = 1; i <= 8; i++) {
-      const ahead = idx + i;
-      if (ahead <= TOTAL) { const img = new Image(); img.src = `${dir}frame_${pad(ahead)}.jpg`; }
+  // pos can be fractional (e.g. 41.6) — crossfades adjacent frames
+  // so scrubbing reads as continuous motion instead of a slideshow.
+  function draw(frames, pos) {
+    const i = Math.floor(pos);
+    const f = pos - i;
+    const a = frames[Math.min(i, TOTAL - 1)];
+    const b = frames[Math.min(i + 1, TOTAL - 1)];
+    if (!a) return;
+    const r = coverRect();
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.globalAlpha = 1;
+    ctx.drawImage(a, r.x, r.y, r.w, r.h);
+    if (b && f > 0.001) {
+      ctx.globalAlpha = f;
+      ctx.drawImage(b, r.x, r.y, r.w, r.h);
+      ctx.globalAlpha = 1;
     }
   }
-  return progress;
+
+  return { draw };
 }
 
 const heroScroll = document.getElementById('hero-scroll');
-const heroFrame  = document.getElementById('hero-frame');
+const heroCanvas = document.getElementById('hero-frame');
 const heroContent = document.getElementById('hero-content');
+const heroStage = makeStage(heroCanvas);
 
 const tourScroll = document.getElementById('tour-scroll');
-const tourFrame  = document.getElementById('tour-frame');
+const tourCanvas = document.getElementById('tour-frame');
+const tourStage = makeStage(tourCanvas);
 
-let ticking = false;
-function onScroll() {
-  if (!ticking) {
-    requestAnimationFrame(() => {
-      const sy = window.scrollY;
-      document.getElementById('nav').classList.toggle('scrolled', sy > 80);
-
-      const heroP = scrub(heroScroll, heroFrame, TOWER);
-      if (heroContent) {
-        heroContent.style.transform = `translateY(${heroP * 120}px)`;
-        heroContent.style.opacity = Math.max(0, 1 - heroP * 1.5);
-      }
-
-      scrub(tourScroll, tourFrame, INT);
-      ticking = false;
-    });
-    ticking = true;
-  }
+function scrollProgress(scrollEl) {
+  const rect = scrollEl.getBoundingClientRect();
+  const travel = scrollEl.offsetHeight - window.innerHeight;
+  if (travel <= 0) return 0;
+  return Math.max(0, Math.min(1, -rect.top / travel));
 }
-window.addEventListener('scroll', onScroll, { passive: true });
+
+let heroFrames = null, tourFrames = null;
+let heroSmoothP = 0, tourSmoothP = 0;
+
+function tick() {
+  requestAnimationFrame(tick);
+
+  heroSmoothP += (scrollProgress(heroScroll) - heroSmoothP) * 0.15;
+  tourSmoothP += (scrollProgress(tourScroll) - tourSmoothP) * 0.15;
+
+  if (heroFrames) heroStage.draw(heroFrames, heroSmoothP * (TOTAL - 1));
+  if (tourFrames) tourStage.draw(tourFrames, tourSmoothP * (TOTAL - 1));
+
+  if (heroContent) {
+    heroContent.style.transform = `translateY(${heroSmoothP * 120}px)`;
+    heroContent.style.opacity = Math.max(0, 1 - heroSmoothP * 1.5);
+  }
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 80);
+}
+
+Promise.all([preloadSequence(TOWER), preloadSequence(INT)]).then(([tf, inf]) => {
+  heroFrames = tf;
+  tourFrames = inf;
+  loader.classList.add('hidden');
+  tick();
+  initAnimations();
+});
 
 // ── INITIATE ENTRY ANIMATIONS ─────────────────────────────────────
 function initAnimations() {
@@ -1182,11 +1226,6 @@ document.getElementById('contact-form').addEventListener('submit', function(e) {
     }
   });
 });
-
-// Force finish loader quickly since images are external
-setTimeout(() => {
-  if (loadProgress < 100) updateLoader(100 - loadProgress);
-}, 1000);
 
 })();
 </script>
