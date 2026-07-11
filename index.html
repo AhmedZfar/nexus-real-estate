@@ -77,88 +77,114 @@ body::after {
 
 /* ── NAVIGATION (skeleton-key motif) ──────────── */
 nav {
-  position: fixed; top: 14px; left: 50%; z-index: 200;
+  position: fixed; top: 10px; left: 50%; z-index: 200;
   transform: translateX(-50%);
   display: flex; align-items: flex-start;
   opacity: 0;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.65));
 }
 :root {
-  --brass-1: #f6e2b8; --brass-2: #c5a47e; --brass-3: #8a6a3f;
-  --brass-grad: linear-gradient(160deg, var(--brass-1) 0%, var(--brass-2) 50%, var(--brass-3) 100%);
+  /* darker, richer antique brass — less "gold jewelry", more cast metal */
+  --brass-1: #d9b877; --brass-2: #93702f; --brass-3: #3c2a12;
+  --brass-edge: #1c1206;
+  --brass-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* the bow: circular key head housing the Home link */
 .key-bow { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; }
 .key-bow-ring {
-  width: 50px; height: 50px; border-radius: 50%;
-  background: radial-gradient(circle at 34% 28%, var(--brass-1) 0%, var(--brass-2) 48%, var(--brass-3) 100%);
-  box-shadow: 0 3px 10px rgba(0,0,0,0.55), inset 0 1px 2px rgba(255,255,255,0.45), inset 0 -3px 5px rgba(0,0,0,0.35);
-  border: 1px solid rgba(0,0,0,0.25);
+  width: 72px; height: 72px; border-radius: 50%;
+  background-image: radial-gradient(circle at 32% 26%, var(--brass-1) 0%, var(--brass-2) 46%, var(--brass-3) 88%), var(--brass-grain);
+  background-blend-mode: normal, overlay;
+  background-size: cover, 90px 90px;
+  box-shadow:
+    0 5px 16px rgba(0,0,0,0.65),
+    0 0 0 2px var(--brass-edge),
+    inset 0 3px 4px rgba(255,240,205,0.6),
+    inset 0 -6px 9px rgba(0,0,0,0.7);
   display: flex; align-items: center; justify-content: center;
   text-decoration: none; cursor: none; position: relative;
   transition: transform .3s ease, box-shadow .3s ease;
 }
 .key-bow-ring::before {
-  content: ''; position: absolute; inset: 9px; border-radius: 50%;
-  background: var(--bg); box-shadow: inset 0 2px 5px rgba(0,0,0,0.7);
+  content: ''; position: absolute; inset: 12px; border-radius: 50%;
+  background: var(--bg);
+  box-shadow: inset 0 3px 7px rgba(0,0,0,0.85), 0 0 0 2px var(--brass-edge);
 }
-.key-bow-ring:hover { transform: scale(1.06); box-shadow: 0 4px 14px rgba(197,164,126,0.4), inset 0 1px 2px rgba(255,255,255,0.5); }
-.key-bow-ring svg { position: relative; z-index: 1; width: 20px; height: 20px; color: var(--brass-1); }
+.key-bow-ring:hover { transform: scale(1.07); box-shadow: 0 6px 18px rgba(0,0,0,0.7), 0 0 0 2px var(--brass-edge), inset 0 3px 4px rgba(255,240,205,0.7), inset 0 -6px 9px rgba(0,0,0,0.7); }
+.key-bow-ring svg { position: relative; z-index: 1; width: 27px; height: 27px; color: var(--brass-1); filter: drop-shadow(0 1px 1px rgba(0,0,0,0.8)); }
 .key-bow-label {
-  margin-top: 7px; font-size: 9px; letter-spacing: 0.22em; font-weight: 600;
-  text-transform: uppercase; color: var(--accent);
+  margin-top: 8px; font-size: 10px; letter-spacing: 0.24em; font-weight: 700;
+  text-transform: uppercase; color: var(--brass-1);
 }
 
 /* the shaft: thin brass bar the tag-links hang from */
-.key-shaft-col { flex: 1; min-width: 220px; padding-top: 20px; position: relative; }
+.key-shaft-col { flex: 1; min-width: 260px; padding-top: 30px; position: relative; }
 .key-shaft {
-  height: 8px; margin: 0 -6px;
-  background: linear-gradient(to bottom, var(--brass-1) 0%, var(--brass-2) 45%, var(--brass-3) 100%);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.45);
-  border-radius: 1px;
+  height: 13px; margin: 0 -8px; border-radius: 1px;
+  background-image: linear-gradient(to bottom, var(--brass-1) 0%, var(--brass-2) 35%, var(--brass-3) 75%, var(--brass-edge) 100%), var(--brass-grain);
+  background-blend-mode: normal, overlay;
+  background-size: cover, 90px 90px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.55), 0 0 0 1px var(--brass-edge), inset 0 1px 1px rgba(255,240,205,0.5);
 }
-.key-tags { display: flex; justify-content: center; gap: 22px; }
+.key-tags { display: flex; justify-content: center; gap: 26px; }
 .key-tag {
   display: flex; flex-direction: column; align-items: center;
-  text-decoration: none; cursor: none; position: relative; padding-top: 11px;
+  text-decoration: none; cursor: none; position: relative; padding-top: 14px;
 }
 .key-tag span:last-child { white-space: nowrap; }
 .key-tag::before {
-  content: ''; position: absolute; top: 0; left: 50%; width: 1px; height: 13px;
-  background: rgba(197,164,126,0.55); transform: translateX(-50%);
+  content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 14px;
+  background: linear-gradient(to bottom, var(--brass-2), var(--brass-edge)); transform: translateX(-50%);
 }
 .key-tag-icon {
-  width: 32px; height: 28px; border-radius: 3px 3px 9px 9px;
-  background: linear-gradient(165deg, var(--brass-1) 0%, var(--brass-2) 55%, var(--brass-3) 100%);
-  box-shadow: 0 3px 7px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.35);
-  border: 1px solid rgba(0,0,0,0.25);
+  width: 42px; height: 36px; border-radius: 4px 4px 12px 12px;
+  background-image: linear-gradient(165deg, var(--brass-1) 0%, var(--brass-2) 50%, var(--brass-3) 85%, var(--brass-edge) 100%), var(--brass-grain);
+  background-blend-mode: normal, overlay;
+  background-size: cover, 90px 90px;
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.6),
+    0 0 0 2px var(--brass-edge),
+    inset 0 2px 2px rgba(255,240,205,0.55),
+    inset 0 -4px 6px rgba(0,0,0,0.6);
   display: flex; align-items: center; justify-content: center;
   transition: filter .3s ease, transform .3s ease;
 }
-.key-tag-icon svg { width: 14px; height: 14px; color: var(--bg); }
+.key-tag-icon svg { width: 18px; height: 18px; color: var(--bg); }
 .key-tag span {
-  margin-top: 6px; font-size: 8.5px; letter-spacing: 0.14em; font-weight: 500;
+  margin-top: 7px; font-size: 9.5px; letter-spacing: 0.14em; font-weight: 600;
   text-transform: uppercase; color: var(--pale); transition: color .3s ease;
 }
-.key-tag:hover .key-tag-icon { filter: brightness(1.15); transform: translateY(-2px); }
-.key-tag:hover span { color: var(--accent); }
+.key-tag:hover .key-tag-icon { filter: brightness(1.25); transform: translateY(-2px); }
+.key-tag:hover span { color: var(--brass-1); }
 
 /* the ring: key's carrying loop, doubling as the CTA */
-.key-ring-wrap { display: flex; flex-direction: column; align-items: center; padding-top: 4px; position: relative; z-index: 2; }
+.key-ring-wrap { display: flex; flex-direction: column; align-items: center; padding-top: 8px; position: relative; z-index: 2; }
 .key-ring {
-  width: 48px; height: 48px; border-radius: 50%;
-  border: 7px solid var(--brass-2);
-  border-top-color: var(--brass-1); border-left-color: var(--brass-1);
-  border-bottom-color: var(--brass-3); border-right-color: var(--brass-3);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+  width: 68px; height: 68px; border-radius: 50%;
+  background-image: radial-gradient(circle at 32% 26%, var(--brass-1) 0%, var(--brass-2) 46%, var(--brass-3) 88%), var(--brass-grain);
+  background-blend-mode: normal, overlay;
+  background-size: cover, 90px 90px;
+  box-shadow:
+    0 5px 14px rgba(0,0,0,0.6),
+    0 0 0 2px var(--brass-edge),
+    inset 0 3px 4px rgba(255,240,205,0.6),
+    inset 0 -6px 9px rgba(0,0,0,0.7);
   display: flex; align-items: center; justify-content: center; text-align: center;
-  text-decoration: none; cursor: none;
+  text-decoration: none; cursor: none; position: relative;
   transition: transform .3s ease, box-shadow .3s ease;
 }
-.key-ring:hover { transform: scale(1.06); box-shadow: 0 4px 14px rgba(197,164,126,0.4); }
+.key-ring::before {
+  content: ''; position: absolute; inset: 11px; border-radius: 50%;
+  background: var(--bg);
+  box-shadow: inset 0 3px 6px rgba(0,0,0,0.85), 0 0 0 2px var(--brass-edge);
+}
+.key-ring span { position: relative; z-index: 1; }
+.key-ring:hover { transform: scale(1.07); box-shadow: 0 6px 18px rgba(0,0,0,0.65), 0 0 0 2px var(--brass-edge), inset 0 3px 4px rgba(255,240,205,0.7), inset 0 -6px 9px rgba(0,0,0,0.7); }
 .key-ring span {
-  font-size: 8px; letter-spacing: 0.08em; line-height: 1.35; font-weight: 700;
-  text-transform: uppercase; color: var(--accent);
+  font-size: 9px; letter-spacing: 0.08em; line-height: 1.35; font-weight: 700;
+  text-transform: uppercase; color: var(--pure);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
 }
 
 /* ── CINEMATIC SCROLL SECTIONS ──────────────── */
