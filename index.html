@@ -59,15 +59,21 @@ body::after {
 #loader {
   position: fixed; inset: 0; background: var(--bg); z-index: 10000;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 24px; transition: opacity 0.8s ease, visibility 0.8s ease;
+  gap: 18px; transition: opacity 0.35s ease, visibility 0.35s ease;
 }
 #loader.hidden { opacity: 0; visibility: hidden; }
 .loader-logo {
   font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 400;
   letter-spacing: 0.4em; color: var(--pure); text-transform: uppercase;
+  animation: loaderPulse 1.6s ease-in-out infinite;
 }
+@keyframes loaderPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
 .loader-bar { width: 160px; height: 1px; background: var(--line); position: relative; overflow: hidden; }
-.loader-fill { position: absolute; left: 0; top: 0; height: 100%; width: 0%; background: var(--accent); }
+.loader-fill { position: absolute; left: 0; top: 0; height: 100%; width: 0%; background: var(--accent); transition: width .15s linear; }
+.loader-pct {
+  font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 0.15em;
+  color: rgba(248,245,240,0.4); font-weight: 300;
+}
 
 /* ── NAVIGATION ─────────────────────────────── */
 nav {
@@ -552,6 +558,7 @@ footer {
 <div id="loader">
   <div class="loader-logo">Meridian</div>
   <div class="loader-bar"><div class="loader-fill" id="loader-fill"></div></div>
+  <div class="loader-pct" id="loader-pct">0%</div>
 </div>
 
 <!-- Cursor -->
@@ -972,32 +979,38 @@ const SRC_W = 1280, SRC_H = 720;
 function pad(n) { return String(n).padStart(3, '0'); }
 
 // ── LOADER ────────────────────────────────────────────────────────
+// Only the tower sequence gates the loading screen — it's what's on
+// screen first. The interior sequence loads quietly in the background
+// once the page is already interactive.
 const loader = document.getElementById('loader');
 const loaderFill = document.getElementById('loader-fill');
+const loaderPct = document.getElementById('loader-pct');
 let loadedCount = 0;
-const TOTAL_TO_LOAD = TOTAL * 2;
 
 function bumpLoader() {
   loadedCount++;
-  loaderFill.style.width = (loadedCount / TOTAL_TO_LOAD * 100) + '%';
+  const pct = Math.min(100, Math.round(loadedCount / TOTAL * 100));
+  loaderFill.style.width = pct + '%';
+  loaderPct.textContent = pct + '%';
 }
 
 // Preload every frame in a sequence up front and decode it off the
 // main thread, so scrubbing during scroll never waits on the network.
-function preloadSequence(dir) {
+function preloadSequence(dir, trackProgress) {
   const frames = new Array(TOTAL);
+  const tick = trackProgress ? bumpLoader : () => {};
   return Promise.all(
     Array.from({ length: TOTAL }, (_, i) => new Promise(resolve => {
       const img = new Image();
       img.onload = () => {
         if (window.createImageBitmap) {
-          createImageBitmap(img).then(bmp => { frames[i] = bmp; bumpLoader(); resolve(); })
-            .catch(() => { frames[i] = img; bumpLoader(); resolve(); });
+          createImageBitmap(img).then(bmp => { frames[i] = bmp; tick(); resolve(); })
+            .catch(() => { frames[i] = img; tick(); resolve(); });
         } else {
-          frames[i] = img; bumpLoader(); resolve();
+          frames[i] = img; tick(); resolve();
         }
       };
-      img.onerror = () => { frames[i] = null; bumpLoader(); resolve(); };
+      img.onerror = () => { frames[i] = null; tick(); resolve(); };
       img.src = `${dir}frame_${pad(i + 1)}.jpg`;
     }))
   ).then(() => frames);
@@ -1109,12 +1122,14 @@ function tick() {
   document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 80);
 }
 
-Promise.all([preloadSequence(TOWER), preloadSequence(INT)]).then(([tf, inf]) => {
+preloadSequence(TOWER, true).then(tf => {
   heroFrames = tf;
-  tourFrames = inf;
   loader.classList.add('hidden');
   tick();
   initAnimations();
+  // Interior sequence loads quietly in the background — by the time
+  // the visitor scrolls that far down, it's usually already there.
+  preloadSequence(INT, false).then(inf => { tourFrames = inf; });
 });
 
 // ── INITIATE ENTRY ANIMATIONS ─────────────────────────────────────
