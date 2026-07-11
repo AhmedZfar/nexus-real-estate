@@ -128,6 +128,20 @@ nav.scrolled {
 }
 .key-bow-ring:hover { transform: scale(1.07); box-shadow: 0 6px 18px rgba(0,0,0,0.7), 0 0 0 2px var(--brass-edge), inset 0 3px 4px rgba(255,240,205,0.7), inset 0 -6px 9px rgba(0,0,0,0.7); }
 .key-bow-ring svg { position: relative; z-index: 1; width: 32px; height: 32px; color: var(--brass-1); filter: drop-shadow(0 1px 1px rgba(0,0,0,0.8)); }
+/* small rivets ringing the bow/ring rim — reads as ornate cast metal, not a plain disc */
+.key-rivets { position: absolute; inset: 0; pointer-events: none; }
+.key-rivets i {
+  position: absolute; top: 50%; left: 50%; width: 5px; height: 5px; border-radius: 50%;
+  margin: -2.5px 0 0 -2.5px;
+  background: radial-gradient(circle at 35% 30%, var(--brass-1), var(--brass-3));
+  box-shadow: 0 0 0 1px var(--brass-edge), inset 0 1px 1px rgba(255,255,255,0.5);
+}
+.key-rivets i:nth-child(1) { transform: rotate(0deg) translate(35px); }
+.key-rivets i:nth-child(2) { transform: rotate(60deg) translate(35px); }
+.key-rivets i:nth-child(3) { transform: rotate(120deg) translate(35px); }
+.key-rivets i:nth-child(4) { transform: rotate(180deg) translate(35px); }
+.key-rivets i:nth-child(5) { transform: rotate(240deg) translate(35px); }
+.key-rivets i:nth-child(6) { transform: rotate(300deg) translate(35px); }
 .key-bow-label {
   margin-top: 9px; font-size: 10.5px; letter-spacing: 0.24em; font-weight: 700;
   text-transform: uppercase; color: var(--brass-1);
@@ -137,12 +151,26 @@ nav.scrolled {
 /* the shaft: thin brass bar the tag-links hang from */
 .key-shaft-col { flex: 1; min-width: 340px; padding: 0 36px; padding-top: 30px; position: relative; }
 .key-shaft {
-  height: 16px; border-radius: 1px;
+  height: 16px; border-radius: 1px; position: relative;
   background-image: var(--brass-brush), linear-gradient(to bottom, var(--brass-1) 0%, var(--brass-2) 35%, var(--brass-3) 75%, var(--brass-edge) 100%), var(--brass-grain);
   background-blend-mode: soft-light, normal, overlay;
   background-size: cover, cover, 46px 46px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.55), 0 0 0 1px var(--brass-edge), inset 0 1px 1px rgba(255,240,205,0.5);
 }
+/* the bit: notched teeth near the ring end, so the silhouette reads unmistakably as a key */
+.key-teeth {
+  position: absolute; right: 8%; top: 100%; display: flex; gap: 3px;
+}
+.key-teeth span {
+  width: 7px; display: block;
+  background-image: linear-gradient(to bottom, var(--brass-2) 0%, var(--brass-3) 70%, var(--brass-edge) 100%), var(--brass-grain);
+  background-blend-mode: normal, overlay;
+  background-size: cover, 30px 30px;
+  box-shadow: 0 0 0 1px var(--brass-edge);
+}
+.key-teeth span:nth-child(1) { height: 10px; }
+.key-teeth span:nth-child(2) { height: 18px; }
+.key-teeth span:nth-child(3) { height: 13px; }
 .key-tags { display: flex; justify-content: space-between; }
 .key-tag {
   display: flex; flex-direction: column; align-items: center;
@@ -196,9 +224,9 @@ nav.scrolled {
   background: var(--bg);
   box-shadow: inset 0 3px 6px rgba(0,0,0,0.85), 0 0 0 2px var(--brass-edge);
 }
-.key-ring span { position: relative; z-index: 1; }
 .key-ring:hover { transform: scale(1.07); box-shadow: 0 6px 18px rgba(0,0,0,0.65), 0 0 0 2px var(--brass-edge), inset 0 3px 4px rgba(255,240,205,0.7), inset 0 -6px 9px rgba(0,0,0,0.7); }
-.key-ring span {
+.key-ring span:last-child {
+  position: relative; z-index: 1;
   font-size: 9px; letter-spacing: 0.08em; line-height: 1.35; font-weight: 700;
   text-transform: uppercase; color: var(--pure);
   text-shadow: 0 1px 2px rgba(0,0,0,0.8);
@@ -662,12 +690,15 @@ footer {
  <div class="key-row">
   <div class="key-bow">
     <a href="#hero-scroll" class="key-bow-ring">
+      <span class="key-rivets"><i></i><i></i><i></i><i></i><i></i><i></i></span>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9h5v-5h4v5h5v-9"/></svg>
     </a>
     <span class="key-bow-label">Home</span>
   </div>
   <div class="key-shaft-col">
-    <div class="key-shaft"></div>
+    <div class="key-shaft">
+      <div class="key-teeth"><span></span><span></span><span></span></div>
+    </div>
     <div class="key-tags">
       <a href="#properties" class="key-tag">
         <span class="key-tag-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-4h6v4"/><path d="M8 7h1M8 11h1M8 15h1M15 7h1M15 11h1M15 15h1"/></svg></span>
@@ -688,7 +719,10 @@ footer {
     </div>
   </div>
   <div class="key-ring-wrap">
-    <a href="#contact" class="key-ring"><span>Contact<br>Us</span></a>
+    <a href="#contact" class="key-ring">
+      <span class="key-rivets"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <span>Contact<br>Us</span>
+    </a>
   </div>
  </div>
 </nav>
