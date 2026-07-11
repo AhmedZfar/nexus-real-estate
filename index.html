@@ -77,26 +77,41 @@ body::after {
 
 /* ── NAVIGATION (skeleton-key motif) ──────────── */
 nav {
-  position: fixed; top: 14px; left: 50%; z-index: 200;
-  transform: translateX(-50%);
-  display: flex; align-items: flex-start;
+  position: fixed; top: 0; left: 0; width: 100%; z-index: 200;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 22px 40px 0;
   opacity: 0;
-  filter: drop-shadow(0 6px 14px rgba(0,0,0,0.6));
+  background: linear-gradient(to bottom, rgba(6,5,3,0.55) 0%, rgba(6,5,3,0.28) 55%, transparent 100%);
+  transition: background .4s ease, padding .3s ease;
+}
+nav.scrolled {
+  padding-top: 12px;
+  background: linear-gradient(to bottom, rgba(6,5,3,0.82) 0%, rgba(6,5,3,0.6) 65%, rgba(6,5,3,0.15) 100%);
+}
+.key-row {
+  width: 100%; max-width: 1180px;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,0.55));
 }
 :root {
-  /* darker, richer antique brass — less "gold jewelry", more cast metal */
-  --brass-1: #d9b877; --brass-2: #93702f; --brass-3: #3c2a12;
-  --brass-edge: #1c1206;
+  /* warm cast brass — enough depth to read as real metal without going near-black */
+  --brass-1: #ecd19c; --brass-2: #b8863f; --brass-3: #6b4a22;
+  --brass-edge: #33220f;
   --brass-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --brass-brush:
+    repeating-linear-gradient(100deg,
+      rgba(255,255,255,0.16) 0px, rgba(255,255,255,0.16) 1px,
+      rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px,
+      transparent 2px, transparent 4px);
 }
 
 /* the bow: circular key head housing the Home link */
 .key-bow { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; }
 .key-bow-ring {
   width: 86px; height: 86px; border-radius: 50%;
-  background-image: radial-gradient(circle at 32% 26%, var(--brass-1) 0%, var(--brass-2) 46%, var(--brass-3) 88%), var(--brass-grain);
-  background-blend-mode: normal, overlay;
-  background-size: cover, 46px 46px;
+  background-image: var(--brass-brush), radial-gradient(circle at 32% 26%, var(--brass-1) 0%, var(--brass-2) 46%, var(--brass-3) 88%), var(--brass-grain);
+  background-blend-mode: soft-light, normal, overlay;
+  background-size: cover, cover, 46px 46px;
   box-shadow:
     0 5px 16px rgba(0,0,0,0.65),
     0 0 0 2px var(--brass-edge),
@@ -116,20 +131,19 @@ nav {
 .key-bow-label {
   margin-top: 9px; font-size: 10.5px; letter-spacing: 0.24em; font-weight: 700;
   text-transform: uppercase; color: var(--brass-1);
-  background: rgba(10,8,4,0.55); padding: 3px 9px; border-radius: 10px;
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  text-shadow: 0 1px 0 rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.6);
 }
 
 /* the shaft: thin brass bar the tag-links hang from */
-.key-shaft-col { flex: 1; min-width: 260px; padding-top: 30px; position: relative; }
+.key-shaft-col { flex: 1; min-width: 340px; padding: 0 36px; padding-top: 30px; position: relative; }
 .key-shaft {
-  height: 16px; margin: 0 -8px; border-radius: 1px;
-  background-image: linear-gradient(to bottom, var(--brass-1) 0%, var(--brass-2) 35%, var(--brass-3) 75%, var(--brass-edge) 100%), var(--brass-grain);
-  background-blend-mode: normal, overlay;
-  background-size: cover, 46px 46px;
+  height: 16px; border-radius: 1px;
+  background-image: var(--brass-brush), linear-gradient(to bottom, var(--brass-1) 0%, var(--brass-2) 35%, var(--brass-3) 75%, var(--brass-edge) 100%), var(--brass-grain);
+  background-blend-mode: soft-light, normal, overlay;
+  background-size: cover, cover, 46px 46px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.55), 0 0 0 1px var(--brass-edge), inset 0 1px 1px rgba(255,240,205,0.5);
 }
-.key-tags { display: flex; justify-content: center; gap: 26px; }
+.key-tags { display: flex; justify-content: space-between; }
 .key-tag {
   display: flex; flex-direction: column; align-items: center;
   text-decoration: none; cursor: none; position: relative; padding-top: 14px;
@@ -141,9 +155,9 @@ nav {
 }
 .key-tag-icon {
   width: 50px; height: 42px; border-radius: 4px 4px 13px 13px;
-  background-image: linear-gradient(165deg, var(--brass-1) 0%, var(--brass-2) 50%, var(--brass-3) 85%, var(--brass-edge) 100%), var(--brass-grain);
-  background-blend-mode: normal, overlay;
-  background-size: cover, 46px 46px;
+  background-image: var(--brass-brush), linear-gradient(165deg, var(--brass-1) 0%, var(--brass-2) 50%, var(--brass-3) 85%, var(--brass-edge) 100%), var(--brass-grain);
+  background-blend-mode: soft-light, normal, overlay;
+  background-size: cover, cover, 46px 46px;
   box-shadow:
     0 4px 10px rgba(0,0,0,0.6),
     0 0 0 2px var(--brass-edge),
@@ -155,9 +169,8 @@ nav {
 .key-tag-icon svg { width: 21px; height: 21px; color: var(--bg); }
 .key-tag span:last-child {
   display: inline-block; margin-top: 7px; font-size: 10px; letter-spacing: 0.14em; font-weight: 600;
-  text-transform: uppercase; color: var(--pale); transition: color .3s ease;
-  background: rgba(10,8,4,0.55); padding: 3px 8px; border-radius: 9px;
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  text-transform: uppercase; color: var(--pure); transition: color .3s ease;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.6);
 }
 .key-tag:hover .key-tag-icon { filter: brightness(1.25); transform: translateY(-2px); }
 .key-tag:hover span { color: var(--brass-1); }
@@ -166,9 +179,9 @@ nav {
 .key-ring-wrap { display: flex; flex-direction: column; align-items: center; padding-top: 8px; position: relative; z-index: 2; }
 .key-ring {
   width: 80px; height: 80px; border-radius: 50%;
-  background-image: radial-gradient(circle at 32% 26%, var(--brass-1) 0%, var(--brass-2) 46%, var(--brass-3) 88%), var(--brass-grain);
-  background-blend-mode: normal, overlay;
-  background-size: cover, 46px 46px;
+  background-image: var(--brass-brush), radial-gradient(circle at 32% 26%, var(--brass-1) 0%, var(--brass-2) 46%, var(--brass-3) 88%), var(--brass-grain);
+  background-blend-mode: soft-light, normal, overlay;
+  background-size: cover, cover, 46px 46px;
   box-shadow:
     0 5px 14px rgba(0,0,0,0.6),
     0 0 0 2px var(--brass-edge),
@@ -646,6 +659,7 @@ footer {
 
 <!-- Nav: skeleton-key motif -->
 <nav id="nav">
+ <div class="key-row">
   <div class="key-bow">
     <a href="#hero-scroll" class="key-bow-ring">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9h5v-5h4v5h5v-9"/></svg>
@@ -676,6 +690,7 @@ footer {
   <div class="key-ring-wrap">
     <a href="#contact" class="key-ring"><span>Contact<br>Us</span></a>
   </div>
+ </div>
 </nav>
 
 <!-- ══ HERO ══ -->
@@ -1237,7 +1252,7 @@ preloadSequence(TOWER, true).then(tf => {
 function initAnimations() {
   const nav = document.getElementById('nav');
   setTimeout(() => {
-    anime({ targets: nav, opacity: [0, 1], translateY: [-14, 0], translateX: '-50%', duration: 800, easing: 'easeOutCubic' });
+    anime({ targets: nav, opacity: [0, 1], translateY: [-14, 0], duration: 800, easing: 'easeOutCubic' });
   }, 250);
 
   const heroSeq = [
