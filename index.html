@@ -78,159 +78,50 @@ body::after {
 /* ── NAVIGATION (skeleton-key motif) ──────────── */
 nav {
   position: fixed; top: 0; left: 0; width: 100%; z-index: 200;
-  display: flex; align-items: flex-start; justify-content: center;
-  padding: 22px 40px 0;
+  display: flex; justify-content: center;
+  padding: 0 40px;
   opacity: 0;
-  background: linear-gradient(to bottom, rgba(6,5,3,0.55) 0%, rgba(6,5,3,0.28) 55%, transparent 100%);
-  transition: background .4s ease, padding .3s ease;
+  background: linear-gradient(to bottom, rgba(6,5,3,0.55) 0%, rgba(6,5,3,0.22) 70%, transparent 100%);
+  border-bottom: 1px solid rgba(217,184,119,0.14);
+  transition: background .4s ease, border-color .4s ease, padding .3s ease;
 }
 nav.scrolled {
-  padding-top: 12px;
-  background: linear-gradient(to bottom, rgba(6,5,3,0.82) 0%, rgba(6,5,3,0.6) 65%, rgba(6,5,3,0.15) 100%);
+  background: rgba(8,7,4,0.86);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-color: rgba(217,184,119,0.1);
 }
-.key-row {
-  width: 100%; max-width: 1180px;
-  display: flex; align-items: flex-start; justify-content: space-between;
-  filter: drop-shadow(0 6px 14px rgba(0,0,0,0.55));
+.nav-row {
+  width: 100%; max-width: 1320px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 24px 0;
+  transition: padding .3s ease;
 }
-:root {
-  /* warm cast brass — enough depth to read as real metal without going near-black */
-  --brass-1: #ecd19c; --brass-2: #b8863f; --brass-3: #6b4a22;
-  --brass-edge: #33220f;
-  --brass-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  --brass-brush:
-    repeating-linear-gradient(100deg,
-      rgba(255,255,255,0.16) 0px, rgba(255,255,255,0.16) 1px,
-      rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px,
-      transparent 2px, transparent 4px);
-}
+nav.scrolled .nav-row { padding: 17px 0; }
 
-/* the bow: circular key head housing the Home link */
-.key-bow { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 2; }
-.key-bow-ring {
-  width: 86px; height: 86px; border-radius: 50%;
-  background-image: var(--brass-brush), radial-gradient(circle at 32% 26%, var(--brass-1) 0%, var(--brass-2) 46%, var(--brass-3) 88%), var(--brass-grain);
-  background-blend-mode: soft-light, normal, overlay;
-  background-size: cover, cover, 46px 46px;
-  box-shadow:
-    0 5px 16px rgba(0,0,0,0.65),
-    0 0 0 2px var(--brass-edge),
-    inset 0 3px 4px rgba(255,240,205,0.6),
-    inset 0 -6px 9px rgba(0,0,0,0.7);
-  display: flex; align-items: center; justify-content: center;
-  text-decoration: none; cursor: none; position: relative;
-  transition: transform .3s ease, box-shadow .3s ease;
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif; font-weight: 500; font-size: 21px;
+  letter-spacing: 0.32em; text-transform: uppercase; color: var(--pure);
+  text-decoration: none; cursor: none;
 }
-.key-bow-ring::before {
-  content: ''; position: absolute; inset: 14px; border-radius: 50%;
-  background: var(--bg);
-  box-shadow: inset 0 3px 7px rgba(0,0,0,0.85), 0 0 0 2px var(--brass-edge);
+.nav-links { display: flex; align-items: center; gap: 44px; }
+.nav-links a {
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--pale); text-decoration: none; transition: color .3s; cursor: none;
+  position: relative; padding-bottom: 5px;
 }
-.key-bow-ring:hover { transform: scale(1.07); box-shadow: 0 6px 18px rgba(0,0,0,0.7), 0 0 0 2px var(--brass-edge), inset 0 3px 4px rgba(255,240,205,0.7), inset 0 -6px 9px rgba(0,0,0,0.7); }
-.key-bow-ring svg { position: relative; z-index: 1; width: 32px; height: 32px; color: var(--brass-1); filter: drop-shadow(0 1px 1px rgba(0,0,0,0.8)); }
-/* small rivets ringing the bow/ring rim — reads as ornate cast metal, not a plain disc */
-.key-rivets { position: absolute; inset: 0; pointer-events: none; }
-.key-rivets i {
-  position: absolute; top: 50%; left: 50%; width: 5px; height: 5px; border-radius: 50%;
-  margin: -2.5px 0 0 -2.5px;
-  background: radial-gradient(circle at 35% 30%, var(--brass-1), var(--brass-3));
-  box-shadow: 0 0 0 1px var(--brass-edge), inset 0 1px 1px rgba(255,255,255,0.5);
+.nav-links a::after {
+  content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 1px;
+  background: var(--accent); transition: width .3s ease;
 }
-.key-rivets i:nth-child(1) { transform: rotate(0deg) translate(35px); }
-.key-rivets i:nth-child(2) { transform: rotate(60deg) translate(35px); }
-.key-rivets i:nth-child(3) { transform: rotate(120deg) translate(35px); }
-.key-rivets i:nth-child(4) { transform: rotate(180deg) translate(35px); }
-.key-rivets i:nth-child(5) { transform: rotate(240deg) translate(35px); }
-.key-rivets i:nth-child(6) { transform: rotate(300deg) translate(35px); }
-.key-bow-label {
-  margin-top: 9px; font-size: 10.5px; letter-spacing: 0.24em; font-weight: 700;
-  text-transform: uppercase; color: var(--brass-1);
-  text-shadow: 0 1px 0 rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.6);
+.nav-links a:hover { color: var(--pure); }
+.nav-links a:hover::after { width: 100%; }
+.nav-cta {
+  font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  padding: 12px 28px; border: 1px solid var(--accent);
+  color: var(--accent); text-decoration: none; cursor: none;
+  transition: background .3s, color .3s;
 }
-
-/* the shaft: thin brass bar the tag-links hang from */
-.key-shaft-col { flex: 1; min-width: 340px; padding: 0 36px; padding-top: 30px; position: relative; }
-.key-shaft {
-  height: 16px; border-radius: 1px; position: relative;
-  background-image: var(--brass-brush), linear-gradient(to bottom, var(--brass-1) 0%, var(--brass-2) 35%, var(--brass-3) 75%, var(--brass-edge) 100%), var(--brass-grain);
-  background-blend-mode: soft-light, normal, overlay;
-  background-size: cover, cover, 46px 46px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.55), 0 0 0 1px var(--brass-edge), inset 0 1px 1px rgba(255,240,205,0.5);
-}
-/* the bit: notched teeth near the ring end, so the silhouette reads unmistakably as a key */
-.key-teeth {
-  position: absolute; right: 8%; top: 100%; display: flex; gap: 3px;
-}
-.key-teeth span {
-  width: 7px; display: block;
-  background-image: linear-gradient(to bottom, var(--brass-2) 0%, var(--brass-3) 70%, var(--brass-edge) 100%), var(--brass-grain);
-  background-blend-mode: normal, overlay;
-  background-size: cover, 30px 30px;
-  box-shadow: 0 0 0 1px var(--brass-edge);
-}
-.key-teeth span:nth-child(1) { height: 10px; }
-.key-teeth span:nth-child(2) { height: 18px; }
-.key-teeth span:nth-child(3) { height: 13px; }
-.key-tags { display: flex; justify-content: space-between; }
-.key-tag {
-  display: flex; flex-direction: column; align-items: center;
-  text-decoration: none; cursor: none; position: relative; padding-top: 14px;
-}
-.key-tag span:last-child { white-space: nowrap; }
-.key-tag::before {
-  content: ''; position: absolute; top: 0; left: 50%; width: 2px; height: 14px;
-  background: linear-gradient(to bottom, var(--brass-2), var(--brass-edge)); transform: translateX(-50%);
-}
-.key-tag-icon {
-  width: 50px; height: 42px; border-radius: 4px 4px 13px 13px;
-  background-image: var(--brass-brush), linear-gradient(165deg, var(--brass-1) 0%, var(--brass-2) 50%, var(--brass-3) 85%, var(--brass-edge) 100%), var(--brass-grain);
-  background-blend-mode: soft-light, normal, overlay;
-  background-size: cover, cover, 46px 46px;
-  box-shadow:
-    0 4px 10px rgba(0,0,0,0.6),
-    0 0 0 2px var(--brass-edge),
-    inset 0 2px 2px rgba(255,240,205,0.55),
-    inset 0 -4px 6px rgba(0,0,0,0.6);
-  display: flex; align-items: center; justify-content: center;
-  transition: filter .3s ease, transform .3s ease;
-}
-.key-tag-icon svg { width: 21px; height: 21px; color: var(--bg); }
-.key-tag span:last-child {
-  display: inline-block; margin-top: 7px; font-size: 10px; letter-spacing: 0.14em; font-weight: 600;
-  text-transform: uppercase; color: var(--pure); transition: color .3s ease;
-  text-shadow: 0 1px 0 rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.6);
-}
-.key-tag:hover .key-tag-icon { filter: brightness(1.25); transform: translateY(-2px); }
-.key-tag:hover span { color: var(--brass-1); }
-
-/* the ring: key's carrying loop, doubling as the CTA */
-.key-ring-wrap { display: flex; flex-direction: column; align-items: center; padding-top: 8px; position: relative; z-index: 2; }
-.key-ring {
-  width: 80px; height: 80px; border-radius: 50%;
-  background-image: var(--brass-brush), radial-gradient(circle at 32% 26%, var(--brass-1) 0%, var(--brass-2) 46%, var(--brass-3) 88%), var(--brass-grain);
-  background-blend-mode: soft-light, normal, overlay;
-  background-size: cover, cover, 46px 46px;
-  box-shadow:
-    0 5px 14px rgba(0,0,0,0.6),
-    0 0 0 2px var(--brass-edge),
-    inset 0 3px 4px rgba(255,240,205,0.6),
-    inset 0 -6px 9px rgba(0,0,0,0.7);
-  display: flex; align-items: center; justify-content: center; text-align: center;
-  text-decoration: none; cursor: none; position: relative;
-  transition: transform .3s ease, box-shadow .3s ease;
-}
-.key-ring::before {
-  content: ''; position: absolute; inset: 13px; border-radius: 50%;
-  background: var(--bg);
-  box-shadow: inset 0 3px 6px rgba(0,0,0,0.85), 0 0 0 2px var(--brass-edge);
-}
-.key-ring:hover { transform: scale(1.07); box-shadow: 0 6px 18px rgba(0,0,0,0.65), 0 0 0 2px var(--brass-edge), inset 0 3px 4px rgba(255,240,205,0.7), inset 0 -6px 9px rgba(0,0,0,0.7); }
-.key-ring span:last-child {
-  position: relative; z-index: 1;
-  font-size: 9px; letter-spacing: 0.08em; line-height: 1.35; font-weight: 700;
-  text-transform: uppercase; color: var(--pure);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-}
+.nav-cta:hover { background: var(--accent); color: var(--bg); }
 
 /* ── CINEMATIC SCROLL SECTIONS ──────────────── */
 .scroll-section { position: relative; }
@@ -662,8 +553,7 @@ footer {
 @media (max-width: 900px) {
   section { padding: 80px 24px; }
   .prop-grid, .svc-grid, .stats-grid { grid-template-columns: 1fr; }
-  .key-tags { display: none; }
-  .key-shaft-col { min-width: 90px; }
+  .nav-links { display: none; }
   .tour-content { flex-direction: column; gap: 40px; padding-top: 120px; align-items: flex-start; }
   .environs-grid, .footer-grid { grid-template-columns: 1fr; gap: 40px; }
   .gallery-grid { grid-template-columns: repeat(2, 1fr); }
@@ -685,46 +575,18 @@ footer {
 <div id="cur"></div>
 <div id="cur-r"></div>
 
-<!-- Nav: skeleton-key motif -->
+<!-- Nav -->
 <nav id="nav">
- <div class="key-row">
-  <div class="key-bow">
-    <a href="#hero-scroll" class="key-bow-ring">
-      <span class="key-rivets"><i></i><i></i><i></i><i></i><i></i><i></i></span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v9h5v-5h4v5h5v-9"/></svg>
-    </a>
-    <span class="key-bow-label">Home</span>
-  </div>
-  <div class="key-shaft-col">
-    <div class="key-shaft">
-      <div class="key-teeth"><span></span><span></span><span></span></div>
+  <div class="nav-row">
+    <a href="#hero-scroll" class="nav-logo">Meridian</a>
+    <div class="nav-links">
+      <a href="#properties">Residences</a>
+      <a href="#tour-scroll">Interiors</a>
+      <a href="#environs">Lifestyle</a>
+      <a href="#contact">Inquiries</a>
     </div>
-    <div class="key-tags">
-      <a href="#properties" class="key-tag">
-        <span class="key-tag-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 21v-4h6v4"/><path d="M8 7h1M8 11h1M8 15h1M15 7h1M15 11h1M15 15h1"/></svg></span>
-        <span>Residences</span>
-      </a>
-      <a href="#tour-scroll" class="key-tag">
-        <span class="key-tag-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 12h18M12 3v18"/></svg></span>
-        <span>Interiors</span>
-      </a>
-      <a href="#environs" class="key-tag">
-        <span class="key-tag-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></span>
-        <span>Lifestyle</span>
-      </a>
-      <a href="#contact" class="key-tag">
-        <span class="key-tag-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 6l9 7 9-7"/></svg></span>
-        <span>Inquiries</span>
-      </a>
-    </div>
+    <a href="#contact" class="nav-cta">Schedule Visit</a>
   </div>
-  <div class="key-ring-wrap">
-    <a href="#contact" class="key-ring">
-      <span class="key-rivets"><i></i><i></i><i></i><i></i><i></i><i></i></span>
-      <span>Contact<br>Us</span>
-    </a>
-  </div>
- </div>
 </nav>
 
 <!-- ══ HERO ══ -->
